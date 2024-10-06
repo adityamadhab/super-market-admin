@@ -35,7 +35,7 @@ export default function CategoryMain() {
         if (newCategory.trim()) {
             try {
                 const token = localStorage.getItem('authToken');
-                const response = await axios.post("http://localhost:80/api/v1/admin/category/add-category",
+                const response = await axios.post("/admin/category/add-category",
                     {
                         category: newCategory.trim(),
                         categoryImage: categoryImage
