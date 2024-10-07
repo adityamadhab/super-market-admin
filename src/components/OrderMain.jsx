@@ -240,7 +240,7 @@ export default function OrderManagement() {
                                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 hidden md:table-cell">
-                                        ${order.products.reduce((total, product) => total + product.totalAmount, 0).toFixed(2)}
+                                        Rs.{order.products.reduce((total, product) => total + product.totalAmount, 0).toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <select
