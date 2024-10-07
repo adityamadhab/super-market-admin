@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { PlusIcon, TrashIcon, PencilIcon, Upload } from "lucide-react";
+import { PlusIcon, TrashIcon, PencilIcon } from "lucide-react";
 import { useRecoilState } from "recoil";
 import { categoriesState } from "../recoil/atoms";
 import axios from "axios";
@@ -30,87 +30,23 @@ export default function CategoryMain() {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleAddCategory = (e) => {
         e.preventDefault();
-        if (newCategory.trim()) {
-            try {
-                const token = localStorage.getItem('authToken');
-                const response = await axios.post("/admin/category/add-category",
-                    {
-                        category: newCategory.trim(),
-                        categoryImage: categoryImage
-                    },
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-
-                setCategories([...categories, response.data]);
-                setNewCategory("");
-                setCategoryImage("");
-                Swal.fire("Success", "Category added successfully", "success");
-            } catch (error) {
-                console.error("Error adding category:", error);
-                Swal.fire("Error", "Failed to add category", "error");
-            }
-        }
+        Swal.fire("Info", "Developer is working on this feature", "info");
     };
 
-    const handleDelete = async (categoryId) => {
-        try {
-            const token = localStorage.getItem('authToken');
-            await axios.delete(`/admin/category/remove-category/${categoryId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            setCategories(categories.filter((cat) => cat._id !== categoryId));
-            Swal.fire("Success", "Category deleted successfully", "success");
-        } catch (error) {
-            console.error("Error deleting category:", error);
-            Swal.fire("Error", "Failed to delete category", "error");
-        }
+    const handleDelete = (categoryId) => {
+        Swal.fire("Info", "Developer is working on this feature", "info");
     };
 
     const handleEdit = (category) => {
-        setEditingCategory(category);
-        setNewCategory(category.category);
-        setCategoryImage(category.categoryImage || "");
+        Swal.fire("Info", "Developer is working on this feature", "info");
     };
 
     const handleCancelEdit = () => {
         setEditingCategory(null);
         setNewCategory("");
         setCategoryImage("");
-    };
-
-    const handleUpdate = async () => {
-        try {
-            const token = localStorage.getItem('authToken');
-            const response = await axios.put(`/admin/category/update-category/${editingCategory._id}`,
-                {
-                    category: newCategory.trim(),
-                    categoryImage: categoryImage
-                },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-            setCategories(categories.map((cat) => (cat._id === editingCategory._id ? response.data : cat)));
-            setEditingCategory(null);
-            setNewCategory("");
-            setCategoryImage("");
-            Swal.fire("Success", "Category updated successfully", "success");
-        } catch (error) {
-            console.error("Error updating category:", error);
-            Swal.fire("Error", "Failed to update category", "error");
-        }
     };
 
     const handleImageChange = (e) => {
@@ -121,7 +57,7 @@ export default function CategoryMain() {
         <div className="min-h-screen w-full mt-4 bg-white text-black p-4 md:p-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Category Management</h1>
 
-            <form onSubmit={editingCategory ? handleUpdate : handleSubmit} className="mb-8">
+            <form onSubmit={handleAddCategory} className="mb-8">
                 <div className="mb-4">
                     <label htmlFor="category-name" className="block mb-2 font-medium">
                         {editingCategory ? "Edit Category" : "Create a Category"}
