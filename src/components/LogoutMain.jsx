@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 // Inline UI components
@@ -66,16 +67,14 @@ const useToast = () => ({
 export default function LogoutPage() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const { toast } = useToast();
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
-        // Simulate logout process
         await new Promise(resolve => setTimeout(resolve, 1000));
+        localStorage.removeItem('authToken');
         setIsLoggingOut(false);
-        toast({
-            title: "Logged out successfully",
-            description: "You have been securely logged out of your account.",
-        });
+        navigate('/');
     };
 
     return (

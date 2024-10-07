@@ -137,7 +137,7 @@ export default function OrderManagement() {
                     <p><strong>Customer:</strong> ${order.user.name}</p>
                     <p><strong>Email:</strong> ${order.user.email}</p>
                     <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
-                    <p><strong>Total:</strong> $${order.products.reduce((total, product) => total + product.totalAmount, 0).toFixed(2)}</p>
+                    <p><strong>Total:</strong> Rs.${order.products.reduce((total, product) => total + product.totalAmount, 0).toFixed(2)}</p>
                     <p><strong>Status:</strong> ${order.status}</p>
                     <h4 class="font-semibold mt-4 mb-2">Items:</h4>
                     <p>${itemsList}</p>

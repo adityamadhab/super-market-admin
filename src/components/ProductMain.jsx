@@ -405,7 +405,7 @@ export default function ProductMain() {
                                                 <p className="text-sm text-gray-600 mb-2">{product.description}</p>
                                                 <p className="text-sm"><span className="font-medium">Brand:</span> {product.brand}</p>
                                                 <p className="text-sm"><span className="font-medium">Stock:</span> {product.stock}</p>
-                                                <p className="text-lg font-bold mt-2">${product.price.toFixed(2)}</p>
+                                                <p className="text-lg font-bold mt-2">Rs.{product.price.toFixed(2)}</p>
                                                 <div className="mt-4 flex justify-between">
                                                     <button
                                                         onClick={() => handleEdit(product)}
