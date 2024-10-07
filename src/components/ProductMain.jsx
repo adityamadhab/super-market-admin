@@ -3,6 +3,7 @@ import { useRecoilState } from "recoil";
 import { categoriesState, productsState } from "../recoil/atoms";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { PlusIcon, PencilIcon } from 'lucide-react';
 
 // Inline UI components with improved styling
 const Button = ({ children, className, ...props }) => (
@@ -67,9 +68,12 @@ export default function ProductMain() {
         brand: "",
         price: 0,
         imageURL: "",
+        stock: 0,
         featuredFlag: false,
     });
     const [base64Images, setBase64Images] = useState([]);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         fetchProducts();
@@ -122,11 +126,13 @@ export default function ProductMain() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (newProduct.name && newProduct.categoryName) {
+            setIsLoading(true);
             try {
                 const response = await axios.post("/product/add", {
                     ...newProduct,
                     base64Images,
                     price: Number(newProduct.price),
+                    stock: Number(newProduct.stock),
                 });
                 setProducts([...products, response.data]);
                 setNewProduct({
@@ -136,17 +142,16 @@ export default function ProductMain() {
                     brand: "",
                     price: 0,
                     imageURL: "",
+                    stock: 0,
                     featuredFlag: false,
                 });
                 setBase64Images([]);
                 Swal.fire("Success", "Product added successfully", "success");
             } catch (error) {
                 console.error("Error adding product:", error);
-                if (error.response && error.response.status === 404) {
-                    Swal.fire("Error", "Category not found", "error");
-                } else {
-                    Swal.fire("Error", "Failed to add product", "error");
-                }
+                Swal.fire("Error", "Failed to add product", "error");
+            } finally {
+                setIsLoading(false);
             }
         }
     };
@@ -174,8 +179,71 @@ export default function ProductMain() {
         }
     };
 
-    const handleEdit = async (product) => {
-        console.log("Edit product:", product);
+    const handleEdit = (product) => {
+        setEditingProduct(product);
+        setNewProduct({
+            name: product.name,
+            categoryName: product.categoryName,
+            description: product.description,
+            brand: product.brand,
+            price: product.price,
+            stock: product.stock,
+            featuredFlag: product.featuredFlag,
+        });
+        setBase64Images([]); // Clear existing images
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        if (editingProduct && newProduct.name && newProduct.categoryName) {
+            setIsLoading(true);
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await axios.put(`/product/update/${editingProduct._id}`, {
+                    ...newProduct,
+                    base64Images,
+                    price: Number(newProduct.price),
+                    stock: Number(newProduct.stock),
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                setProducts(products.map(p => p._id === editingProduct._id ? response.data : p));
+                setEditingProduct(null);
+                setNewProduct({
+                    name: "",
+                    categoryName: "",
+                    description: "",
+                    brand: "",
+                    price: 0,
+                    imageURL: "",
+                    stock: 0,
+                    featuredFlag: false,
+                });
+                setBase64Images([]);
+                Swal.fire("Success", "Product updated successfully", "success");
+            } catch (error) {
+                console.error("Error updating product:", error);
+                Swal.fire("Error", "Failed to update product", "error");
+            }
+        }
+    };
+
+    const handleCancelEditing = async () => {
+        await setEditingProduct(null);
+        await setNewProduct({
+            name: "",
+            categoryName: "",
+            description: "",
+            brand: "",
+            price: 0,
+            imageURL: "",
+            stock: 0,
+            featuredFlag: false,
+        });
+        await setBase64Images([]);
     };
 
     return (
@@ -187,7 +255,7 @@ export default function ProductMain() {
                         <CardTitle>Add New Product</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={editingProduct ? handleUpdate : handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <Label htmlFor="name">Product Name</Label>
@@ -219,6 +287,18 @@ export default function ProductMain() {
                                     value={newProduct.description}
                                     onChange={handleInputChange}
                                     rows="3"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="stock">Stock</Label>
+                                <Input
+                                    id="stock"
+                                    name="stock"
+                                    type="number"
+                                    value={newProduct.stock}
+                                    onChange={handleInputChange}
+                                    min="0"
+                                    required
                                 />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -266,10 +346,38 @@ export default function ProductMain() {
                                     onChange={(e) => setNewProduct(prev => ({ ...prev, featuredFlag: e.target.checked }))}
                                 />
                             </div>
-                            <Button type="submit" className="w-full">
-                                <PlusCircle />
-                                Add Product
-                            </Button>
+                            <div className="flex flex-col space-y-2">
+                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <span className="flex items-center justify-center">
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            {editingProduct ? "Updating..." : "Adding..."}
+                                        </span>
+                                    ) : (
+                                        <>
+                                            {editingProduct ? (
+                                                <div className="flex gap-2 justify-center items-center">
+                                                    <PencilIcon className="w-5 h-5 mr-2" />
+                                                    Update Product
+                                                </div>
+                                            ) : (
+                                                <div className="flex gap-2 justify-center items-center">
+                                                    <PlusIcon className="w-5 h-5 mr-2" />
+                                                    Add Product
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </Button>
+                                {editingProduct && (
+                                    <Button type="button" onClick={handleCancelEditing} className="w-full bg-gray-300 text-black hover:bg-gray-400">
+                                        Cancel Edit
+                                    </Button>
+                                )}
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
@@ -296,6 +404,7 @@ export default function ProductMain() {
                                                 <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
                                                 <p className="text-sm text-gray-600 mb-2">{product.description}</p>
                                                 <p className="text-sm"><span className="font-medium">Brand:</span> {product.brand}</p>
+                                                <p className="text-sm"><span className="font-medium">Stock:</span> {product.stock}</p>
                                                 <p className="text-lg font-bold mt-2">${product.price.toFixed(2)}</p>
                                                 <div className="mt-4 flex justify-between">
                                                     <button
