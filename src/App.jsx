@@ -9,7 +9,7 @@ import { Logout } from './pages/Logout';
 import { Order } from './pages/Order';
 import axios from 'axios';
 
-axios.defaults.baseURL = "https://api.debugify.org/api/v1";
+axios.defaults.baseURL = "https://api.supermarketservices.shop/api/v1";
 
 function App() {
   return (
