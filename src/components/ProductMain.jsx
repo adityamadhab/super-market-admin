@@ -198,12 +198,13 @@ export default function ProductMain() {
         if (editingProduct && newProduct.name && newProduct.categoryName) {
             setIsLoading(true);
             try {
+                console.log("Updating product:", newProduct.stock);
                 const token = localStorage.getItem('authToken');
                 const response = await axios.put(`/product/update/${editingProduct._id}`, {
                     ...newProduct,
                     base64Images,
-                    price: Number(newProduct.price),
-                    stock: Number(newProduct.stock),
+                    price: newProduct.price,
+                    stock: newProduct.stock,
                 }, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
