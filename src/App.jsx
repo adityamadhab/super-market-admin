@@ -9,7 +9,7 @@ import { Logout } from './pages/Logout';
 import { Order } from './pages/Order';
 import axios from 'axios';
 
-axios.defaults.baseURL = "http://localhost:3001/api/v1";
+axios.defaults.baseURL = "https://api.supermarketservices.in/api/v1";
 
 function App() {
   return (
