@@ -126,24 +126,42 @@ export default function OrderManagement() {
                 throw new Error("Order not found");
             }
 
-            const itemsList = order.products.map(product =>
-                `${product.productID} - Quantity: ${product.quantity}, Price: $${product.totalAmount.toFixed(2)}`
-            ).join('<br>');
+            const itemsList = order.products.map(product => `
+                <div class="mb-4 p-3 border rounded">
+                    <p><strong>Product Name:</strong> ${product.name}</p>
+                    <p><strong>Product ID:</strong> ${product.productID}</p>
+                    <p><strong>Quantity:</strong> ${product.quantity}</p>
+                    <p><strong>Price per unit:</strong> Rs.${product.price.toFixed(2)}</p>
+                    <p><strong>Original Price:</strong> Rs.${product.originalPriceWas.toFixed(2)}</p>
+                    <p><strong>Total Amount:</strong> Rs.${product.totalAmount.toFixed(2)}</p>
+
+                </div>
+            `).join('');
 
             Swal.fire({
                 title: 'Order Details',
                 html: `
-                    <p><strong>Order ID:</strong> ${order.orderID}</p>
-                    <p><strong>Customer:</strong> ${order.user.name}</p>
-                    <p><strong>Email:</strong> ${order.user.email}</p>
-                    <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
-                    <p><strong>Total:</strong> Rs.${order.products.reduce((total, product) => total + product.totalAmount, 0).toFixed(2)}</p>
-                    <p><strong>Status:</strong> ${order.status}</p>
-                    <h4 class="font-semibold mt-4 mb-2">Items:</h4>
-                    <p>${itemsList}</p>
+                    <div class="text-left">
+                        <h3 class="font-bold mb-3">Order Information</h3>
+                        <p><strong>Order ID:</strong> ${order.orderID}</p>
+                        <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+                        <p><strong>Total Order Amount:</strong> Rs.${order.totalOrderAmount.toFixed(2)}</p>
+                        
+                        <h3 class="font-bold mt-4 mb-3">Customer Information</h3>
+                        <p><strong>Name:</strong> ${order.user.name}</p>
+                        <p><strong>Phone:</strong> ${order.user.phone}</p>
+                        
+                        <h3 class="font-bold mt-4 mb-3">Delivery Address</h3>
+                        <p>${order.user.address}</p>
+                        <p>${order.user.city}, ${order.user.state}</p>
+                        <p>${order.user.country} - ${order.user.pincode}</p>
+                        
+                        <h3 class="font-bold mt-4 mb-3">Products</h3>
+                        ${itemsList}
+                    </div>
                 `,
                 width: '90%',
-                maxWidth: '600px',
+                maxWidth: '800px',
                 confirmButtonText: 'Close',
                 confirmButtonColor: '#3085d6',
             });
